@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NADIR — Official Site</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#0b0313; --ink:#f4ecff; --neon:#c8ff00; --violet:#8b2fff; }
+  body { background:var(--bg); color:var(--ink); font-family:'Segoe UI', system-ui, sans-serif; overflow-x:hidden; }
+  #viz { position:fixed; bottom:0; left:0; width:100%; height:180px; z-index:1; pointer-events:none; }
+  nav { position:fixed; top:0; width:100%; z-index:10; display:flex; justify-content:space-between; align-items:center; padding:24px 6vw; background:linear-gradient(180deg, rgba(11,3,19,.9), transparent); }
+  .logo { font-size:24px; font-weight:900; letter-spacing:6px; }
+  .logo span { color:var(--neon); }
+  nav ul { display:flex; gap:30px; list-style:none; }
+  nav a { color:rgba(244,236,255,.75); text-decoration:none; font-size:13px; letter-spacing:2px; text-transform:uppercase; }
+  nav a:hover { color:var(--neon); }
+  header { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; z-index:2; padding:0 6vw;
+    background:radial-gradient(800px 500px at 50% 30%, rgba(139,47,255,.35), transparent 70%); }
+  .drop { color:var(--neon); letter-spacing:5px; font-size:13px; text-transform:uppercase; animation:pulse 2s infinite; }
+  @keyframes pulse { 50% { opacity:.5; } }
+  h1 { font-size:clamp(60px, 13vw, 190px); font-weight:900; letter-spacing:-4px; line-height:.95; margin:16px 0 10px;
+    background:linear-gradient(180deg, #fff 30%, #8b2fff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tagline { color:rgba(244,236,255,.6); font-size:17px; }
+  .listen { margin-top:40px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+  .btn { padding:16px 38px; border-radius:50px; font-size:14px; font-weight:700; letter-spacing:1px; text-decoration:none; text-transform:uppercase; transition:.3s; }
+  .btn-neon { background:var(--neon); color:#0b0313; }
+  .btn-neon:hover { box-shadow:0 0 44px rgba(200,255,0,.5); transform:translateY(-3px); }
+  .btn-line { border:1px solid rgba(244,236,255,.3); color:var(--ink); }
+  .btn-line:hover { border-color:var(--neon); color:var(--neon); }
+  section { position:relative; z-index:2; padding:110px 6vw; max-width:1200px; margin:0 auto; }
+  .sec-tag { color:var(--neon); letter-spacing:4px; font-size:12px; text-transform:uppercase; }
+  h2 { font-size:clamp(30px,4.5vw,54px); font-weight:900; letter-spacing:-1px; margin:12px 0 50px; }
+  .albums { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; }
+  .album { border-radius:14px; overflow:hidden; position:relative; aspect-ratio:1; transition:.35s; cursor:pointer; }
+  .album:hover { transform:scale(1.03); }
+  .album .art { position:absolute; inset:0; }
+  .a1 { background:conic-gradient(from 40deg, #8b2fff, #c8ff00, #ff2f92, #8b2fff); }
+  .a2 { background:linear-gradient(135deg, #0ff, #8b2fff 60%, #0b0313); }
+  .a3 { background:radial-gradient(circle at 30% 30%, #c8ff00, #ff2f92 60%, #1a0526); }
+  .album .meta { position:absolute; bottom:0; left:0; right:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,.85)); }
+  .album .meta h3 { font-size:19px; }
+  .album .meta span { font-size:12px; color:rgba(244,236,255,.65); }
+  .album .play { position:absolute; top:16px; right:16px; width:44px; height:44px; border-radius:50%; background:var(--neon); color:#0b0313; display:grid; place-items:center; font-size:16px; opacity:0; transition:.3s; }
+  .album:hover .play { opacity:1; }
+  .tour { border-top:1px solid rgba(244,236,255,.1); }
+  .show { display:grid; grid-template-columns:110px 1fr auto; gap:22px; align-items:center; padding:26px 10px; border-bottom:1px solid rgba(244,236,255,.1); transition:.25s; }
+  .show:hover { background:rgba(139,47,255,.08); padding-left:22px; }
+  .show .date { text-align:center; }
+  .show .date b { font-size:28px; display:block; color:var(--neon); }
+  .show .date span { font-size:12px; letter-spacing:2px; color:rgba(244,236,255,.5); }
+  .show .where h3 { font-size:20px; }
+  .show .where p { color:rgba(244,236,255,.55); font-size:14px; margin-top:4px; }
+  .show .tix { padding:12px 28px; border:1px solid var(--neon); color:var(--neon); border-radius:40px; text-decoration:none; font-size:13px; font-weight:700; letter-spacing:1px; transition:.25s; }
+  .show .tix:hover { background:var(--neon); color:#0b0313; }
+  .show.sold .tix { border-color:rgba(244,236,255,.2); color:rgba(244,236,255,.35); pointer-events:none; }
+  footer { position:relative; z-index:2; padding:70px 6vw 200px; text-align:center; color:rgba(244,236,255,.5); font-size:13px; }
+  footer .socials { display:flex; gap:22px; justify-content:center; margin-bottom:22px; }
+  footer .socials a { color:var(--ink); text-decoration:none; font-size:14px; letter-spacing:2px; }
+  footer .socials a:hover { color:var(--neon); }
+  @media (max-width:700px){ nav ul{display:none;} .show{grid-template-columns:80px 1fr;} .show .tix{grid-column:1/-1; text-align:center;} }
+</style>
+</head>
+<body>
+<canvas id="viz"></canvas>
+<nav>
+  <div class="logo">NADIR<span>.</span></div>
+  <ul><li><a href="#music">Music</a></li><li><a href="#tour">Tour</a></li><li><a href="#contact">Contact</a></li></ul>
+</nav>
+<header>
+  <div class="drop">New album "ZAWIYA" out now</div>
+  <h1>NADIR</h1>
+  <p class="tagline">Electronic shaabi from Cairo to the world.</p>
+  <div class="listen">
+    <a href="#music" class="btn btn-neon">▶ Listen now</a>
+    <a href="#tour" class="btn btn-line">Tour dates</a>
+  </div>
+</header>
+<section id="music">
+  <div class="sec-tag">Discography</div>
+  <h2>Music</h2>
+  <div class="albums">
+    <div class="album"><div class="art a1"></div><div class="play">▶</div><div class="meta"><h3>ZAWIYA</h3><span>2026 · Album · 11 tracks</span></div></div>
+    <div class="album"><div class="art a2"></div><div class="play">▶</div><div class="meta"><h3>NEON NILE</h3><span>2024 · EP · 5 tracks</span></div></div>
+    <div class="album"><div class="art a3"></div><div class="play">▶</div><div class="meta"><h3>3AM MOUNIRA</h3><span>2022 · Album · 9 tracks</span></div></div>
+  </div>
+</section>
+<section id="tour">
+  <div class="sec-tag">On the road</div>
+  <h2>Tour dates</h2>
+  <div class="tour">
+    <div class="show"><div class="date"><b>12</b><span>DEC</span></div><div class="where"><h3>Cairo</h3><p>The Greek Campus — Downtown</p></div><a class="tix" href="#">Tickets</a></div>
+    <div class="show"><div class="date"><b>19</b><span>DEC</span></div><div class="where"><h3>Alexandria</h3><p>Bibliotheca Open Stage</p></div><a class="tix" href="#">Tickets</a></div>
+    <div class="show sold"><div class="date"><b>09</b><span>JAN</span></div><div class="where"><h3>Dubai</h3><p>Coca-Cola Arena</p></div><a class="tix" href="#">Sold out</a></div>
+    <div class="show"><div class="date"><b>23</b><span>JAN</span></div><div class="where"><h3>Amman</h3><p>The Dome — Abdali</p></div><a class="tix" href="#">Tickets</a></div>
+    <div class="show"><div class="date"><b>06</b><span>FEB</span></div><div class="where"><h3>London</h3><p>O2 Shepherd's Bush</p></div><a class="tix" href="#">Tickets</a></div>
+  </div>
+</section>
+<footer id="contact">
+  <div class="socials"><a href="#">INSTAGRAM</a><a href="#">SPOTIFY</a><a href="#">YOUTUBE</a><a href="#">TIKTOK</a></div>
+  <div>Booking: booking@nadirmusic.com · © 2026 NADIR</div>
+</footer>
+<script>
+  // Fake audio visualizer
+  const c = document.getElementById('viz'), x = c.getContext('2d');
+  const N = 64, bars = new Array(N).fill(0);
+  function draw(){
+    c.width = innerWidth; c.height = 180;
+    const w = c.width / N;
+    for(let i=0;i<N;i++){
+      const target = (Math.sin(Date.now()/300 + i*.55)*.5+.5) * (Math.sin(Date.now()/170 + i)*.5+.5) * 140 + 6;
+      bars[i] += (target - bars[i]) * .2;
+      const g = x.createLinearGradient(0, 180-bars[i], 0, 180);
+      g.addColorStop(0, '#c8ff00'); g.addColorStop(1, 'rgba(139,47,255,.25)');
+      x.fillStyle = g;
+      x.fillRect(i*w + 1.5, 180 - bars[i], w - 3, bars[i]);
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>
